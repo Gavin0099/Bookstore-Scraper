@@ -1,0 +1,51 @@
+scraper:
+  delay_min: 1.0          # 請求間隔下限（秒）
+  delay_max: 3.0          # 請求間隔上限（秒）
+  timeout: 15             # 單頁請求逾時（秒）
+  max_retries: 3          # 最大重試次數
+  backoff_factor: 2       # Exponential backoff 倍數
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
+suncolor:
+  base_url: "https://www.suncolor.com.tw"
+  catalog_path: "BookList.aspx"
+  book_path: "BookPage.aspx"
+  page_size: 18
+  # 20 個大分類（2026-03-06 確認自官網導覽）
+  categories:
+    - {knd: "0", knd2: "01", name: "文學小說"}
+    - {knd: "0", knd2: "02", name: "商業理財"}
+    - {knd: "0", knd2: "03", name: "藝術設計"}
+    - {knd: "0", knd2: "04", name: "人文史地"}
+    - {knd: "0", knd2: "05", name: "社會科學"}
+    - {knd: "0", knd2: "06", name: "自然科普"}
+    - {knd: "0", knd2: "07", name: "心理勵志"}
+    - {knd: "0", knd2: "08", name: "醫療保健"}
+    - {knd: "0", knd2: "09", name: "飲食"}
+    - {knd: "0", knd2: "10", name: "生活風格"}
+    - {knd: "0", knd2: "11", name: "旅遊"}
+    - {knd: "0", knd2: "12", name: "宗教命理"}
+    - {knd: "0", knd2: "13", name: "親子教養"}
+    - {knd: "0", knd2: "14", name: "童書青少年"}
+    - {knd: "0", knd2: "15", name: "輕小說"}
+    - {knd: "0", knd2: "16", name: "漫畫"}
+    - {knd: "0", knd2: "17", name: "語言學習"}
+    - {knd: "0", knd2: "18", name: "考試用書"}
+    - {knd: "0", knd2: "19", name: "電腦資訊"}
+    - {knd: "0", knd2: "99", name: "系列套書"}
+
+output:
+  directory: "."          # 輸出目錄（預設與執行目錄相同）
+  excel_prefix: "suncolor_books"
+  log_prefix: "scraper"
+
+# 過濾規則（缺書關鍵字）
+filter:
+  exclude_keywords:
+    - "缺書"
+    - "缺貨"
+    - "絕版"
+    - "停售"
+    - "預購"
+  # schema.org availability 非此值則排除
+  available_status: "https://schema.org/InStock"
