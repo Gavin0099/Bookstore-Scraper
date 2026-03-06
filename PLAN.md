@@ -37,10 +37,10 @@
 ├─ [✓] Phase A: 環境建置與網站探索   (2026/03/06 完成)
 ├─ [✓] Phase B: 核心爬蟲實作         (2026/03/06 完成)
 ├─ [✓] Phase C: 輸出與整合           (2026/03/06 完成)
-└─ [🔄] Phase D: 測試與驗收           (進行中，預計 2026/03/09)
+└─ [✓] Phase D: 測試與驗收           (2026/03/06 完成)
 ```
 
-**當前 Phase**: **Phase D — 測試與驗收**
+**當前 Phase**: **全部完成 ✅**
 
 ---
 
@@ -317,3 +317,4 @@ AI: 我看到 PLAN.md:
 | 2026/03/06 | 完成 A1+A2：目錄結構、requirements.txt、config.yaml | Phase A Gate 全部通過，進入 Phase B |
 | 2026/03/06 | 完成 Phase B：book.py、logger.py、http_client.py、suncolor.py | 核心爬蟲模組全部實作 |
 | 2026/03/06 | 完成 Phase C：excel_writer.py、main.py | 輸出整合完成，進入 Phase D 驗收 |
+| 2026/03/06 | 完成 Phase D：tests/ (32 tests)、README.md | AC-01~07 全部通過，專案完成 |
