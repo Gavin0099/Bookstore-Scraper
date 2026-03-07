@@ -8,6 +8,7 @@ scraper:
 
 suncolor:
   base_url: "https://www.suncolor.com.tw"
+  excel_prefix: "三采文化"
   catalog_path: "BookList.aspx"          # 一般分類目錄（備用）
   kids_catalog_path: "KidsBookList.aspx" # 童書分齡推薦目錄
   book_path: "BookPage.aspx"
@@ -18,9 +19,18 @@ suncolor:
     - {knd: "71", knd2: "7105", name: "小妖怪系列",   path: "kids"}
     - {knd: "74", knd2: "74",   name: "套書推薦",     path: "kids"}
 
+weesing:
+  base_url: "https://www.weesing123.com.tw"
+  excel_prefix: "華碩文化"
+  categories:
+    - {slug: "sound-book",          name: "有聲書"}
+    - {slug: "pop-up-book",         name: "立體書"}
+    - {slug: "play-book",           name: "遊戲書"}
+    - {slug: "talking-pen-edition", name: "點讀書"}
+    - {slug: "new-arrival",         name: "新品上市"}
+
 output:
   directory: "."
-  excel_prefix: "三采文化"
   log_prefix: "scraper"
 
 # 過濾規則（缺書關鍵字）

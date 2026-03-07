@@ -34,19 +34,19 @@ class TestWriteExcel:
             assert "書單" in wb.sheetnames
 
     def test_header_row(self):
-        """第一列標題為 ISBN、書名、定價。"""
+        """第一列標題為 ISBN、分類、書名、定價。"""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = write_excel(_make_books(), output_dir=tmpdir)
             ws = load_workbook(path)["書單"]
-            headers = [ws.cell(1, c).value for c in range(1, 4)]
-            assert headers == ["ISBN", "書名", "定價"]
+            headers = [ws.cell(1, c).value for c in range(1, 5)]
+            assert headers == ["ISBN", "分類", "書名", "定價"]
 
     def test_header_bold(self):
         """標題列為粗體（spec §3.1）。"""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = write_excel(_make_books(), output_dir=tmpdir)
             ws = load_workbook(path)["書單"]
-            for col in range(1, 4):
+            for col in range(1, 5):
                 assert ws.cell(1, col).font.bold is True
 
     def test_row_count(self):
@@ -80,12 +80,12 @@ class TestWriteExcel:
                 assert ws.cell(row, 1).number_format == "@"
 
     def test_price_is_integer(self):
-        """定價欄位為整數。"""
+        """定價欄位（第4欄）為整數。"""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = write_excel(_make_books(), output_dir=tmpdir)
             ws = load_workbook(path, data_only=True)["書單"]
             for row in range(2, ws.max_row + 1):
-                price = ws.cell(row, 3).value
+                price = ws.cell(row, 4).value
                 assert isinstance(price, int)
 
     def test_empty_books(self):

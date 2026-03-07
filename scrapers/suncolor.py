@@ -13,57 +13,32 @@ DOM 結構（2026-03-06 確認）：
 """
 from __future__ import annotations
 
-import json
 import re
 from typing import Generator, Optional
-from urllib.parse import urljoin, urlencode
+from urllib.parse import urlencode
 
 from bs4 import BeautifulSoup
 
 from models.book import Book
+from scrapers.base import BaseScraper
 from utils.http_client import HttpClient
 from utils.logger import get_logger
 
 logger = get_logger()
 
-# schema.org availability 代表「可購買」的值
-_INSTOCK_URL = "https://schema.org/InStock"
 
-# 庫存狀態文字：出現任一則跳過
-_EXCLUDE_KEYWORDS = ("缺書", "缺貨", "絕版", "停售", "預購")
-
-
-class SuncolorScraper:
+class SuncolorScraper(BaseScraper):
     def __init__(self, config: dict, client: HttpClient) -> None:
+        super().__init__(config, client)
         self.base_url: str = config["suncolor"]["base_url"]
         self.catalog_path: str = config["suncolor"]["catalog_path"]
         self.kids_catalog_path: str = config["suncolor"].get("kids_catalog_path", "KidsBookList.aspx")
         self.book_path: str = config["suncolor"]["book_path"]
         self.page_size: int = config["suncolor"]["page_size"]
         self.categories: list[dict] = config["suncolor"]["categories"]
-        self.available_status: str = config["filter"]["available_status"]
-        self.exclude_keywords: tuple[str, ...] = tuple(
-            config["filter"]["exclude_keywords"]
-        )
-        self.client = client
-
-        # 重複 ISBN 追蹤（spec §2.3）
-        self._seen_isbns: set[str] = set()
 
         # 重複 bokno 追蹤（在發出詳情頁請求前就過濾，避免浪費網路時間）
         self._seen_boknos: set[str] = set()
-
-        # 統計
-        self.stats = {
-            "pages": 0,
-            "processed": 0,
-            "success": 0,
-            "skipped_unavailable": 0,
-            "skipped_no_isbn": 0,
-            "skipped_invalid": 0,
-            "skipped_duplicate": 0,
-            "skipped_parse_error": 0,
-        }
 
     # ------------------------------------------------------------------ #
     # 公開介面
@@ -139,77 +114,15 @@ class SuncolorScraper:
             return None
 
     # ------------------------------------------------------------------ #
-    # 書籍詳情頁解析
-    # ------------------------------------------------------------------ #
-
-    def _fetch_book(self, url: str, category: str = "") -> Optional[Book]:
-        """解析詳情頁，回傳 Book 或 None（跳過）。"""
-        self.stats["processed"] += 1
-
-        resp = self.client.get(url)
-        if resp is None:
-            logger.error("詳情頁請求失敗：%s", url)
-            self.stats["skipped_parse_error"] += 1
-            return None
-
-        try:
-            soup = BeautifulSoup(resp.text, "lxml")
-
-            # 1. 庫存過濾
-            if not self._is_available(soup):
-                self.stats["skipped_unavailable"] += 1
-                return None
-
-            # 2. 擷取欄位
-            title = self._parse_title(soup)
-            price = self._parse_price(soup)
-            isbn = self._parse_isbn(soup)
-
-            # 3. ISBN 缺失
-            if isbn is None:
-                logger.warning("ISBN 缺失，跳過：%s", url)
-                self.stats["skipped_no_isbn"] += 1
-                return None
-
-            # 4. 重複 ISBN（spec §2.3）
-            if isbn in self._seen_isbns:
-                logger.warning("重複 ISBN %s，跳過：%s", isbn, url)
-                self.stats["skipped_duplicate"] += 1
-                return None
-
-            book = Book(title=title or "", price=price or 0, isbn=isbn, source_url=url, category=category)
-
-            # 5. 資料品質驗證
-            errors = book.validate()
-            if errors:
-                logger.warning("資料品質不合格（%s），跳過：%s", "；".join(errors), url)
-                self.stats["skipped_invalid"] += 1
-                return None
-
-            self._seen_isbns.add(isbn)
-            self.stats["success"] += 1
-            return book
-
-        except Exception as exc:
-            logger.error("詳情頁解析例外：%s — %s", url, exc)
-            self.stats["skipped_parse_error"] += 1
-            return None
-
-    # ------------------------------------------------------------------ #
     # 解析輔助
     # ------------------------------------------------------------------ #
 
     def _is_available(self, soup: BeautifulSoup) -> bool:
-        """優先讀 schema.org JSON-LD；備援檢查頁面文字。"""
-        # 方法 1：schema.org JSON-LD
-        for script in soup.find_all("script", type="application/ld+json"):
-            try:
-                data = json.loads(script.string or "")
-                availability = data.get("availability", "")
-                if availability:
-                    return availability == self.available_status
-            except (json.JSONDecodeError, AttributeError):
-                continue
+        """優先讀 schema.org JSON-LD；備援檢查頁面文字與按鈕。"""
+        # 方法 1：schema.org JSON-LD（BaseScraper 共用輔助）
+        result = self._is_available_schema(soup)
+        if result is not None:
+            return result
 
         # 方法 2：備援 — 頁面文字含排除關鍵字
         page_text = soup.get_text()
@@ -230,14 +143,6 @@ class SuncolorScraper:
         m = re.search(r"定價[：:]\s*(\d+)\s*元", text)
         if m:
             return int(m.group(1))
-        return None
-
-    def _parse_isbn(self, soup: BeautifulSoup) -> Optional[str]:
-        """解析「ISBN：XXXXXXXXXXXXX」→ 13 碼字串；失敗回傳 None。"""
-        text = soup.get_text()
-        m = re.search(r"ISBN[：:]\s*(\d{13})", text)
-        if m:
-            return m.group(1)
         return None
 
     # ------------------------------------------------------------------ #
