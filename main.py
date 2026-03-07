@@ -16,6 +16,7 @@ import yaml
 
 from models.book import Book
 from output.excel_writer import write_excel
+from scrapers.acmebook import AcmebookScraper
 from scrapers.suncolor import SuncolorScraper
 from scrapers.weesing import WeesingsScraper
 from utils.http_client import HttpClient
@@ -25,6 +26,7 @@ from utils.logger import get_logger, setup_logger
 PUBLISHER_MAP = {
     "suncolor": (SuncolorScraper, "suncolor"),
     "weesing":  (WeesingsScraper, "weesing"),
+    "acmebook": (AcmebookScraper, "acmebook"),
 }
 
 

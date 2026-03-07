@@ -29,6 +29,24 @@ weesing:
     - {slug: "talking-pen-edition", name: "點讀書"}
     - {slug: "new-arrival",         name: "新品上市"}
 
+acmebook:
+  base_url: "https://www.acmebook.com.tw"
+  excel_prefix: "采實文化"
+  categories:
+    - {type_sn1: "1",  name: "飲食"}
+    - {type_sn1: "2",  name: "生活風格"}
+    - {type_sn1: "3",  name: "醫療保健"}
+    - {type_sn1: "4",  name: "親子教養"}
+    - {type_sn1: "5",  name: "商業理財"}
+    - {type_sn1: "6",  name: "藝術設計"}
+    - {type_sn1: "7",  name: "心理勵志"}
+    - {type_sn1: "8",  name: "學習語言"}
+    - {type_sn1: "9",  name: "人文史地"}
+    - {type_sn1: "10", name: "童書"}
+    - {type_sn1: "12", name: "自然科普"}
+    - {type_sn1: "15", name: "文學小說"}
+    - {type_sn1: "16", name: "DUDUBAO"}
+
 output:
   directory: "."
   log_prefix: "scraper"
