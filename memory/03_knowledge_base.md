@@ -20,6 +20,22 @@
 **Solution**: 寫入時明確設定 `cell.number_format = '@'` 或 `data_type = 's'`
 **Verification**: test_excel_writer.py 中的 ISBN 格式單元測試
 
+## 📖 各書商技術特徵（2026-03-07 確認）
+
+| 書商 | URL | 渲染 | 分頁規則 | 定價解析 | 庫存判斷 |
+|------|-----|------|---------|---------|---------|
+| 三采文化 | suncolor.com.tw | ASP.NET SSR | BookList.aspx?knd=X&p=N | 「定價：NNN元」文字 | schema.org + 按鈕文字 |
+| 華碩文化 | weesing123.com.tw | Shopline SSR | /{slug}?page=N | .price-old class | schema.org + 關鍵字 |
+| 采實文化 | acmebook.com.tw | PHP SSR | book_list.php?page_num=N&bookType_sn1=XX | 「定價 NNN 元」 | 無標記，全部視為可售 |
+| 信誼 | hsinyishop.com | Shopline Angular SPA | sitemap.xml → /products/hXXXX | product["price"]["dollars"] | product["sold_out"] |
+
+### 信誼技術細節（OQ-F1 已解決 2026-03-07）
+- 雖然是 Angular SPA，但商品資料以 `app.value('product', {...})` 嵌在靜態 HTML 的 `<script>` 標籤中
+- **不需要 Playwright**：requests 即可取得，用 `json.JSONDecoder.raw_decode()` 提取 JSON
+- 商品 URL 來源：`/sitemap.xml` 的 `<loc>` 標籤，約 500+ 個 /products/ URL
+- ISBN：`product["gtin"]`（若 13 碼採用）；備援：頁面文字掃描
+- 注意：gtin 可能是 12 位 EAN 而非 13 位 ISBN，此時 isbn 欄位會走備援方案
+
 ## 🚫 Anti-Patterns
 
 ### 1. 在 OQ 未確認前開始實作爬蟲 (2026-03-06)

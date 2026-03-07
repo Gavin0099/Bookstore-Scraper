@@ -36,5 +36,15 @@
 - [x] D3. 完整驗收 AC-01 ~ AC-07（全部通過）
 - [x] D4. README.md
 
-### Phase E: v2 多書商擴充 (Status: Planning)
-- [ ] 待 User 確認是否啟動
+### Phase E: v2 多書商擴充 (Status: Completed 2026-03-07)
+架構：BaseScraper 抽象類別 + --publisher 參數
+
+已完成書商：
+- [x] 三采文化 (suncolor.com.tw) — ASP.NET SSR, schema.org availability
+- [x] 華碩文化 (weesing123.com.tw) — Shopline SSR, .grid-box a, price-old class
+- [x] 采實文化 (acmebook.com.tw) — PHP SSR, book.php?sn=, 無庫存標記
+
+### Phase F: 信誼（hsinyishop.com）(Status: Completed 2026-03-07)
+- [x] 爬蟲架構：sitemap.xml → /products/ URLs → app.value('product', JSON) 提取
+- [x] 無需 Playwright（OQ-F1 解決：資料嵌於靜態 HTML script 標籤）
+- [x] scrapers/hsinyi.py + config.yaml hsinyi 區段 + main.py PUBLISHER_MAP

@@ -47,6 +47,10 @@ acmebook:
     - {type_sn1: "15", name: "文學小說"}
     - {type_sn1: "16", name: "DUDUBAO"}
 
+hsinyi:
+  base_url: "https://www.hsinyishop.com"
+  excel_prefix: "信誼"
+
 output:
   directory: "."
   log_prefix: "scraper"
