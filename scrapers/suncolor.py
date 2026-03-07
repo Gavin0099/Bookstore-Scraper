@@ -37,6 +37,7 @@ class SuncolorScraper:
     def __init__(self, config: dict, client: HttpClient) -> None:
         self.base_url: str = config["suncolor"]["base_url"]
         self.catalog_path: str = config["suncolor"]["catalog_path"]
+        self.kids_catalog_path: str = config["suncolor"].get("kids_catalog_path", "KidsBookList.aspx")
         self.book_path: str = config["suncolor"]["book_path"]
         self.page_size: int = config["suncolor"]["page_size"]
         self.categories: list[dict] = config["suncolor"]["categories"]
@@ -79,11 +80,13 @@ class SuncolorScraper:
 
     def _scrape_category(self, cat: dict) -> Generator[Book, None, None]:
         knd, knd2, name = cat["knd"], cat["knd2"], cat["name"]
-        logger.info("分類：%s (knd=%s knd2=%s)", name, knd, knd2)
+        # 根據 path 欄位選擇目錄 URL
+        use_kids_path = cat.get("path", "") == "kids"
+        logger.info("分類：%s (knd=%s knd2=%s, path=%s)", name, knd, knd2, "kids" if use_kids_path else "normal")
 
         page = 1
         while True:
-            url = self._catalog_url(knd, knd2, page)
+            url = self._catalog_url(knd, knd2, page, kids=use_kids_path)
             bokno_list = self._fetch_catalog_page(url)
 
             if bokno_list is None:  # 請求失敗
@@ -100,7 +103,7 @@ class SuncolorScraper:
                 self._seen_boknos.add(bokno)
 
                 detail_url = self._detail_url(bokno)
-                book = self._fetch_book(detail_url)
+                book = self._fetch_book(detail_url, category=name)
                 if book is not None:
                     yield book
 
@@ -139,7 +142,7 @@ class SuncolorScraper:
     # 書籍詳情頁解析
     # ------------------------------------------------------------------ #
 
-    def _fetch_book(self, url: str) -> Optional[Book]:
+    def _fetch_book(self, url: str, category: str = "") -> Optional[Book]:
         """解析詳情頁，回傳 Book 或 None（跳過）。"""
         self.stats["processed"] += 1
 
@@ -174,7 +177,7 @@ class SuncolorScraper:
                 self.stats["skipped_duplicate"] += 1
                 return None
 
-            book = Book(title=title or "", price=price or 0, isbn=isbn, source_url=url)
+            book = Book(title=title or "", price=price or 0, isbn=isbn, source_url=url, category=category)
 
             # 5. 資料品質驗證
             errors = book.validate()
@@ -241,7 +244,8 @@ class SuncolorScraper:
     # URL 建構
     # ------------------------------------------------------------------ #
 
-    def _catalog_url(self, knd: str, knd2: str, page: int) -> str:
+    def _catalog_url(self, knd: str, knd2: str, page: int, kids: bool = False) -> str:
+        path = self.kids_catalog_path if kids else self.catalog_path
         params = urlencode({
             "knd": knd,
             "knd2": knd2,
@@ -249,7 +253,7 @@ class SuncolorScraper:
             "pagesize": self.page_size,
             "sort": "",
         })
-        return f"{self.base_url}/{self.catalog_path}?{params}"
+        return f"{self.base_url}/{path}?{params}"
 
     def _detail_url(self, bokno: str) -> str:
         return f"{self.base_url}/{self.book_path}?bokno={bokno}"

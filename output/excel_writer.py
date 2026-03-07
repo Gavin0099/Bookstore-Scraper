@@ -3,7 +3,7 @@
 輸出格式：
   檔名    : suncolor_books_YYYYMMDD_HHMMSS.xlsx
   工作表  : 書單
-  欄位    : 書名 | 定價 | ISBN
+  欄位    : ISBN | 分類 | 書名 | 定價
   第一列  : 標題列（粗體）
   ISBN    : 強制文字格式（避免科學記號，spec AC-03）
 """
@@ -33,7 +33,7 @@ def write_excel(
     ws.title = "書單"
 
     # 標題列（粗體）
-    headers = ["書名", "定價", "ISBN"]
+    headers = ["ISBN", "分類", "書名", "定價"]
     ws.append(headers)
     bold = Font(bold=True)
     for cell in ws[1]:
@@ -42,13 +42,14 @@ def write_excel(
     # 資料列
     for book in books:
         ws.append([
-            book.title,          # 文字，左對齊（Excel 預設）
-            book.price,          # 數值，整數
             _isbn_cell(book.isbn),  # 強制文字格式
+            book.category,          # 分類名稱
+            book.title,             # 文字，左對齊（Excel 預設）
+            book.price,             # 數値，整數
         ])
 
-    # ISBN 欄（C 欄）設為文字格式，防止科學記號
-    for row in ws.iter_rows(min_row=2, min_col=3, max_col=3):
+    # ISBN 欄（A 欄）設為文字格式，防止科學記號
+    for row in ws.iter_rows(min_row=2, min_col=1, max_col=1):
         for cell in row:
             cell.number_format = "@"
 

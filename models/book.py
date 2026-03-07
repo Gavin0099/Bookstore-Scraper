@@ -8,6 +8,8 @@ class Book:
     price: int
     isbn: str
     source_url: str = field(default="", repr=False)
+    category: str = field(default="", repr=False)  # 所屬分類名稱（Excel 分類欄）
+
 
     # ------------------------------------------------------------------ #
     # 資料品質驗證（spec §2.3）
