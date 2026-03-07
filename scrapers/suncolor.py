@@ -49,6 +49,9 @@ class SuncolorScraper:
         # 重複 ISBN 追蹤（spec §2.3）
         self._seen_isbns: set[str] = set()
 
+        # 重複 bokno 追蹤（在發出詳情頁請求前就過濾，避免浪費網路時間）
+        self._seen_boknos: set[str] = set()
+
         # 統計
         self.stats = {
             "pages": 0,
@@ -65,10 +68,10 @@ class SuncolorScraper:
     # 公開介面
     # ------------------------------------------------------------------ #
 
-    def scrape_all(self) -> Generator[Book, None, None]:
-        """巡覽全部分類，yield 每一本合法書籍。"""
+    def scrape_all(self) -> Generator[tuple[str, Generator[Book, None, None]], None, None]:
+        """巡覽全部分類，yield (分類名稱, books_generator)。"""
         for cat in self.categories:
-            yield from self._scrape_category(cat)
+            yield cat["name"], self._scrape_category(cat)
 
     # ------------------------------------------------------------------ #
     # 分類 → 分頁
@@ -91,6 +94,11 @@ class SuncolorScraper:
             self.stats["pages"] += 1
 
             for bokno in bokno_list:
+                # 若已抓過此 bokno，直接跳過，不發出網路請求
+                if bokno in self._seen_boknos:
+                    continue
+                self._seen_boknos.add(bokno)
+
                 detail_url = self._detail_url(bokno)
                 book = self._fetch_book(detail_url)
                 if book is not None:
@@ -111,13 +119,17 @@ class SuncolorScraper:
 
         try:
             soup = BeautifulSoup(resp.text, "lxml")
-            links = soup.select("a[href*='BookPage.aspx?bokno=']")
+            # 只選主商品格的連結 (a.product-image)，排除側欄暢銷榜
+            links = soup.select("a.product-image")
             bokno_list: list[str] = []
             for a in links:
                 href: str = a.get("href", "")
                 m = re.search(r"bokno=(\w+)", href)
                 if m:
-                    bokno_list.append(m.group(1))
+                    bokno = m.group(1)
+                    # list 去重（同一目錄頁內）
+                    if bokno not in bokno_list:
+                        bokno_list.append(bokno)
             return bokno_list
         except Exception as exc:
             logger.error("目錄頁解析失敗：%s — %s", url, exc)
