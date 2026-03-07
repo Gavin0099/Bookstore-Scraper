@@ -22,9 +22,9 @@
 |------|------|
 | JS 渲染需求 | ❌ 不需要，純 ASP.NET server-side HTML |
 | 缺書標記 | schema.org JSON-LD `"availability"` 欄位；備援：按鈕文字 |
-| 目錄分頁 URL | `BookList.aspx?knd=0&knd2=XX&p=N&pagesize=18&sort=` |
+| 目錄分頁 URL | 一般：`BookList.aspx?knd=0&knd2=XX` <br> 童書分齡推薦：`KidsBookList.aspx?knd=XX&knd2=XXXX` |
 | 書籍詳情 URL | `BookPage.aspx?bokno=XXXXXXXXXX` |
-| robots.txt | `/BookList.aspx`、`/BookPage.aspx` 均合法 |
+| robots.txt | `/BookList.aspx`、`/KidsBookList.aspx`、`/BookPage.aspx` 均合法 |
 
 ## ⚠️ Known Gotchas & Solutions
 

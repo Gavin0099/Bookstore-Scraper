@@ -10,6 +10,9 @@
   - [x] 縮限分類至「親子教養」＋「童書/青少年文學」
   - [x] tqdm 進度條整合
   - [x] Excel 欄位順序修正為 ISBN → 書名 → 定價
+  - [x] Excel 新增「分類」欄位 (ISBN -> 分類 -> 書名 -> 定價)
+  - [x] 修改 Excel 輸出檔名前綴為 `三采文化`
+  - [x] 根據開團需求，變更目標為 4 個童書子分類 (學齡前0~3歲、學齡前3~6歲、小妖怪系列、套書推薦)，並支援 `KidsBookList.aspx` 路徑
   - [x] CSS selector 改為 `a.product-image`（排除側欄暢銷榜）
   - [x] `_seen_boknos` 預先過濾（發請求前跳過重複 bokno）
   - [x] `scripts/verify_selector.py` 驗證腳本
