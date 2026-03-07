@@ -72,12 +72,22 @@ def main() -> None:
     scraper = SuncolorScraper(config=config, client=client)
     books: list[Book] = []
 
+    from tqdm import tqdm
+
     try:
-        for book in scraper.scrape_all():
-            books.append(book)
-            logger.debug("✓ %s | %d | %s", book.isbn, book.price, book.title[:30])
+        # 改以分類為單位顯示進度
+        for category_name, book_gen in scraper.scrape_all():
+            # 使用 tqdm 顯示當前分類，因為不知道總數，使用 postfix 顯示收集量
+            with tqdm(desc=f"爬取中 - {category_name}", unit="本", leave=False) as pbar:
+                for book in book_gen:
+                    books.append(book)
+                    logger.debug("✓ %s | %d | %s", book.isbn, book.price, book.title[:30])
+                    pbar.update(1)
+                    pbar.set_postfix({"總收集": len(books)})
     except KeyboardInterrupt:
         logger.warning("使用者中斷執行")
+    except Exception as exc:
+        logger.error("爬蟲執行中遇到非預期錯誤：%s — 已收集 %d 筆，繼續輸出", exc, len(books))
 
     # 輸出 Excel
     excel_path = write_excel(books, output_dir=args.output)
