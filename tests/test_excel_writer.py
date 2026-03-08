@@ -34,19 +34,19 @@ class TestWriteExcel:
             assert "書單" in wb.sheetnames
 
     def test_header_row(self):
-        """第一列標題為 ISBN、分類、書名、定價。"""
+        """第一列標題為 ISBN、分類、書名、定價、簡介、封面圖。"""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = write_excel(_make_books(), output_dir=tmpdir)
             ws = load_workbook(path)["書單"]
-            headers = [ws.cell(1, c).value for c in range(1, 5)]
-            assert headers == ["ISBN", "分類", "書名", "定價"]
+            headers = [ws.cell(1, c).value for c in range(1, 7)]
+            assert headers == ["ISBN", "分類", "書名", "定價", "簡介", "封面圖"]
 
     def test_header_bold(self):
         """標題列為粗體（spec §3.1）。"""
         with tempfile.TemporaryDirectory() as tmpdir:
             path = write_excel(_make_books(), output_dir=tmpdir)
             ws = load_workbook(path)["書單"]
-            for col in range(1, 5):
+            for col in range(1, 7):
                 assert ws.cell(1, col).font.bold is True
 
     def test_row_count(self):
