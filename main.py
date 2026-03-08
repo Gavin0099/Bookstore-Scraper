@@ -17,8 +17,10 @@ import yaml
 from models.book import Book
 from output.excel_writer import write_excel
 from scrapers.acmebook import AcmebookScraper
+from scrapers.grimm import GrimmScraper
 from scrapers.hsinyi import HsinyiScraper
 from scrapers.suncolor import SuncolorScraper
+from scrapers.tienwei import TienweiScraper
 from scrapers.weesing import WeesingsScraper
 from utils.http_client import HttpClient
 from utils.logger import get_logger, setup_logger
@@ -29,6 +31,8 @@ PUBLISHER_MAP = {
     "weesing":  (WeesingsScraper, "weesing"),
     "acmebook": (AcmebookScraper, "acmebook"),
     "hsinyi":   (HsinyiScraper,   "hsinyi"),
+    "tienwei":  (TienweiScraper,  "tienwei"),
+    "grimm":    (GrimmScraper,    "grimm"),
 }
 
 

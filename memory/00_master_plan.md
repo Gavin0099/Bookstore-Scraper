@@ -48,3 +48,17 @@
 - [x] 爬蟲架構：sitemap.xml → /products/ URLs → app.value('product', JSON) 提取
 - [x] 無需 Playwright（OQ-F1 解決：資料嵌於靜態 HTML script 標籤）
 - [x] scrapers/hsinyi.py + config.yaml hsinyi 區段 + main.py PUBLISHER_MAP
+
+### Phase G: 小魯文化（tienwei.com.tw）(Status: Completed 2026-03-07)
+- [x] OQ-G1 確認：分類列表為 AJAX 端點，但直接 GET 可取 HTML，不需 Playwright
+- [x] 7 個兒童書分類：繪本(39)/有聲書(44)/詩歌(50)/橋樑書(57)/童話故事(60)/兒童小說(61)/知識繪本(321)
+- [x] ISBN 含連字號格式（978-XXX-XXX-XXX-X）→ strip → 13 碼
+- [x] scrapers/tienwei.py + config.yaml tienwei 區段 + main.py PUBLISHER_MAP
+- [x] 格林文化（grimmpress.com.tw）調查 → 無需 Playwright（OQ-H1 解決）→ 見 Phase H
+
+### Phase H: 格林文化（grimmpress.com.tw）(Status: Completed 2026-03-07)
+- [x] OQ-H1 解決：父分類（path=59）無產品；子分類（path=59_60 等）靜態 HTML 含產品
+- [x] 5 個兒童書分類：0-3歲/4-6歲/7-9歲/10-12歲/青少年（path=59_60~59_64）
+- [x] 產品 URL 格式：/product/{id}/{path}（SEO URL，非標準 OpenCart 格式）
+- [x] 原價：原價：NNN元（.price-old class）；ISBN 含連字號
+- [x] scrapers/grimm.py + config.yaml grimm 區段 + main.py PUBLISHER_MAP

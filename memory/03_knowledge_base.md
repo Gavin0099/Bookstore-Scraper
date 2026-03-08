@@ -28,6 +28,8 @@
 | 華碩文化 | weesing123.com.tw | Shopline SSR | /{slug}?page=N | .price-old class | schema.org + 關鍵字 |
 | 采實文化 | acmebook.com.tw | PHP SSR | book_list.php?page_num=N&bookType_sn1=XX | 「定價 NNN 元」 | 無標記，全部視為可售 |
 | 信誼 | hsinyishop.com | Shopline Angular SPA | sitemap.xml → /products/hXXXX | product["price"]["dollars"] | product["sold_out"] |
+| 小魯文化 | tienwei.com.tw | PHP SSR + AJAX 列表 | /product/include_product_index_list.php?bid=XX&page=N | 「定價：$NNN」 | 「缺貨」關鍵字 |
+| 格林文化 | grimmpress.com.tw | OpenCart SSR（子分類） | ?route=product/category&path=59_XX&page=N | 「原價：NNN元」(.price-old) | id=button-cart 按鈕文字 |
 
 ### 信誼技術細節（OQ-F1 已解決 2026-03-07）
 - 雖然是 Angular SPA，但商品資料以 `app.value('product', {...})` 嵌在靜態 HTML 的 `<script>` 標籤中
@@ -35,6 +37,21 @@
 - 商品 URL 來源：`/sitemap.xml` 的 `<loc>` 標籤，約 500+ 個 /products/ URL
 - ISBN：`product["gtin"]`（若 13 碼採用）；備援：頁面文字掃描
 - 注意：gtin 可能是 12 位 EAN 而非 13 位 ISBN，此時 isbn 欄位會走備援方案
+
+### 小魯文化技術細節（OQ-G1 已解決 2026-03-07）
+- 分類頁面（`/product/39` 等）雖用 JS `getProduct()` 載入，但實際 AJAX 端點可直接 GET
+- **AJAX URL**: `https://www.tienwei.com.tw/product/include_product_index_list.php?bid=XX&page=N`
+- 每頁 20 筆，繪本(bid=39)共 886 筆 / 45 頁（其他分類數量各異）
+- 詳情頁 `/product/detailXXXX` 為 SSR，書名在 `<h1>`，定價「定價：$NNN」，ISBN 含連字號
+- ISBN 格式：`978-XXX-XXX-XXX-X` → `.replace("-", "")` → 13 碼
+- 格林文化（grimmpress.com.tw）：OQ-H1 解決，見下方
+
+### 格林文化技術細節（OQ-H1 已解決 2026-03-07）
+- **關鍵陷阱**：WebFetch/curl 父分類（`path=59`）看不到產品；需用**子分類** `path=59_60` 格式才有靜態 HTML 產品列表
+- 每頁 9 筆；子分類 0-3歲(59_60)=69筆/8頁；4-6歲(59_61)=234筆；7-9歲(59_62)=202筆
+- 產品 URL：SEO 格式 `/product/{id}/{path}`（非標準 `?route=product/product&product_id=X`）
+- 書名在詳情頁 `<h1>`，原價「原價：NNN元」（.price-old class），ISBN 含連字號
+- 庫存：`id=button-cart` 按鈕存在且非缺貨關鍵字 = 可售；備援：關鍵字掃描
 
 ## 🚫 Anti-Patterns
 

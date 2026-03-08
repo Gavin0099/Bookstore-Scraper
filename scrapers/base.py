@@ -96,8 +96,11 @@ class BaseScraper(ABC):
                 self.stats["skipped_duplicate"] += 1
                 return None
 
+            image_url = self._parse_image(soup) or ""
+            description = self._parse_description(soup) or ""
             book = Book(title=title or "", price=price or 0, isbn=isbn,
-                        source_url=url, category=category)
+                        source_url=url, category=category,
+                        image_url=image_url, description=description)
 
             # 5. 資料品質驗證
             errors = book.validate()
@@ -149,3 +152,11 @@ class BaseScraper(ABC):
 
     @abstractmethod
     def _parse_price(self, soup: BeautifulSoup) -> Optional[int]: ...
+
+    def _parse_image(self, soup: BeautifulSoup) -> Optional[str]:
+        """封面圖 URL；子類別可覆寫。預設回傳 None。"""
+        return None
+
+    def _parse_description(self, soup: BeautifulSoup) -> Optional[str]:
+        """內容簡介；子類別可覆寫。預設回傳 None。"""
+        return None

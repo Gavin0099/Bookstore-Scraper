@@ -145,6 +145,25 @@ class SuncolorScraper(BaseScraper):
             return int(m.group(1))
         return None
 
+    def _parse_image(self, soup: BeautifulSoup) -> Optional[str]:
+        """取最大尺寸封面圖 URL（imageapi，w=775）。"""
+        img = soup.find("img", src=re.compile(r"imageapi.*w=775"))
+        if img:
+            return img["src"]
+        # 備援：任何 imageapi 圖片
+        img = soup.find("img", src=re.compile(r"imageapi"))
+        return img["src"] if img else None
+
+    def _parse_description(self, soup: BeautifulSoup) -> Optional[str]:
+        """取「內容簡介」段落文字（前 500 字）。"""
+        for marker in soup.find_all(string=lambda s: s and s.strip() == "內容簡介"):
+            sibling = marker.parent.find_next_sibling()
+            if sibling:
+                text = sibling.get_text(strip=True)
+                if text:
+                    return text[:500]
+        return None
+
     # ------------------------------------------------------------------ #
     # URL 建構
     # ------------------------------------------------------------------ #

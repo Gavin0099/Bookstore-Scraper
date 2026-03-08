@@ -8,7 +8,9 @@ class Book:
     price: int
     isbn: str
     source_url: str = field(default="", repr=False)
-    category: str = field(default="", repr=False)  # 所屬分類名稱（Excel 分類欄）
+    category: str = field(default="", repr=False)   # 所屬分類名稱（Excel 分類欄）
+    image_url: str = field(default="", repr=False)   # 封面圖 URL
+    description: str = field(default="", repr=False) # 內容簡介
 
 
     # ------------------------------------------------------------------ #

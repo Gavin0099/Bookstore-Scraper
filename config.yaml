@@ -51,6 +51,29 @@ hsinyi:
   base_url: "https://www.hsinyishop.com"
   excel_prefix: "信誼"
 
+tienwei:
+  base_url: "https://www.tienwei.com.tw"
+  excel_prefix: "小魯文化"
+  categories:
+    - {bid: "39",  name: "繪本"}
+    - {bid: "44",  name: "有聲書"}
+    - {bid: "50",  name: "詩歌"}
+    - {bid: "57",  name: "橋樑書"}
+    - {bid: "60",  name: "童話故事"}
+    - {bid: "61",  name: "兒童小說"}
+    - {bid: "321", name: "知識繪本"}
+
+grimm:
+  base_url: "https://www.grimmpress.com.tw"
+  excel_prefix: "格林文化"
+  categories:
+    # 依年齡選讀子分類（path=59_XX 格式才有產品，父分類 path=59 無產品）
+    - {path: "59_60", name: "0-3歲適合閱讀"}
+    - {path: "59_61", name: "4-6歲適合閱讀"}
+    - {path: "59_62", name: "7-9歲適合閱讀"}
+    - {path: "59_63", name: "10-12歲適合閱讀"}
+    - {path: "59_64", name: "青少年適合閱讀"}
+
 output:
   directory: "."
   log_prefix: "scraper"
